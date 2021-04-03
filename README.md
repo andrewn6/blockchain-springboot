@@ -1,7 +1,7 @@
 # blockchain-springboot
 
 ## Concept
-This consits of two crucial parts the agent and interface.
+This consists of two crucial parts the agent and interface.
 
 ## Agent
 An agent stands for one peer store and mine blocks in the network.
