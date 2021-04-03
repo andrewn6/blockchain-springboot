@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.0RELEASE")
     }
 }
 
@@ -15,13 +15,13 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'application'
 
 jar {
-    baseName = 'blockchain-demo'
-    version = '0.0.1'
+    baseName = 'blockchain'
+    version = '1.0.0'
 }
 
 war {
-    baseName = 'blockchain-demo'
-    version = '0.0.1'
+    baseName = 'blockchain'
+    version = '1.0.0'
 }
 
 application {
