@@ -12,4 +12,17 @@ distributed network. The basic functions for an agent are
 - Mine/validate and grow blocks on the own blockchain
 - It syncs the latest blockchain with other agents.
 
+## Start
+Navigate to the root of the project directory then:
+```
+$ gradle bootRun
+```
+
+This should start up a web interface. open http://localhost:8080 to view the dashboard.
+
+The basic actions are:
+- Add an agent
+- Delete an agent
+- Mine a new block and broadcast to the network.
+- 
 *A project by Andrew Nijmeh, Mkz32 and PineappleRind.*
