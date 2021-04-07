@@ -60,19 +60,27 @@ public class Block implements Serializable {
     }
 
     public String getCreator() {
+
         return creator;
     }
 
     public int getIndex() {
+
         return index;
     }
 
     public long getTimestamp() {
+
         return timestamp;
     }
 
     public String getPreviousHash() {
+
         return previousHash;
+    }
+
+    public String getHash() {
+        return hash;
     }
 
     private String calculateHash(String text) {

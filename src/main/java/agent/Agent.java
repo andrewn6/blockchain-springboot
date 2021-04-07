@@ -1,8 +1,6 @@
 package agent;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -20,14 +18,14 @@ import static agent.Message.MESSAGE_TYPE.RSP_ALL_BLOCKS;
 
 public class Agent {
 
-    private String name;
-    private String address;
-    private int port;
-    private List<Agent> peers;
+    private final String name;
+    private final String address;
+    private final int port;
+    private final List<Agent> peers;
     private List<Block> blockchain = new ArrayList<>();
 
     private ServerSocket serverSocket;
-    private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
+    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
 
     private boolean listening = true;
 
@@ -67,7 +65,7 @@ public class Agent {
 
         final int index = previousBlock.getIndex() + 1;
         final Block block = new Block(index, previousBlock.getPreviousHash(), name);
-        System.out.println(String.format("%s created new block %s", name, block.toString()));
+        System.out.printf("%s created new block %s%n", name, block.toString());
         broadcast(INFO_NEW_BLOCK, block);
         return block;
     }
@@ -83,18 +81,18 @@ public class Agent {
         executor.execute(() -> {
             try {
                 serverSocket = new ServerSocket(port);
-                System.out.println(String.format("Server started %s started", serverSocket.getLocalPort()));
+                System.out.printf("Server started %s started%n", serverSocket.getLocalPort());
                 listening = true;
                 while (listening) {
                     final AgentServerThread thread = new AgentServerThread(Agent.this, serverSocket.accept());
-                    thread.start;
+                    thread.start();
                 }
                 serverSocket.close();
             } catch (IOException e) {
                 System.err.println("Could not run port" + port);
             }
         });
-        boardcast(REQ_ALL_BLOCKS, null);
+        broadcast(REQ_ALL_BLOCKS, null);
     }
 
     void stopHost() {
@@ -123,7 +121,7 @@ public class Agent {
         final int expected = latestBlock.getIndex() + 1;
 
         if (block.getIndex() != expected) {
-            System.out.println(String.format("Invalid index. Expected: %s Actual: %s", expected, block.getIndex()));
+            System.out.printf("Invalid index. Expected: %s Actual: %s%n", expected, block.getIndex());
             return false;
         }
         if (!Objects.equals(block.getPreviousHash(), latestBlock.getHash())) {
@@ -138,9 +136,40 @@ public class Agent {
     }
 
     private void sendMessage(Message.MESSAGE_TYPE type, String host, int port, Block... blocks) {
-        try {
-
+        try (
+                final Socket peer = new Socket(host, port);
+                final ObjectOutputStream out = new ObjectOutputStream(peer.getOutputStream());
+                final ObjectInputStream in = new ObjectInputStream(peer.getInputStream())) {
+            Object fromPeer;
+            while ((fromPeer = in.readObject()) != null) {
+                if (fromPeer instanceof Message) {
+                    final Message msg = (Message) fromPeer;
+                    System.out.printf("%d received: %s%n", this.port, msg.toString());
+                    if (READY == msg.type) {
+                        out.writeObject(new Message.MessageBuilder()
+                                .withType(type)
+                                .withReceiver(port)
+                                .withSender(this.port)
+                                .withBlocks(Arrays.asList(blocks)).build());
+                    } else if (RSP_ALL_BLOCKS == msg.type) {
+                        if (!msg.blocks.isEmpty() && this.blockchain.size() == 1) {
+                            blockchain = new ArrayList<>(msg.blocks);
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (UnknownHostException e) {
+            System.err.printf("Unknown host %s %d%n", host, port);
+        } catch (IOException e) {
+            System.err.printf("%s couldn't get I/O for the connection to %s. Retrying...%n%n", getPort(), port);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
-
 }
