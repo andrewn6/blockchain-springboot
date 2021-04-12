@@ -2,9 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Blockchain Node</title>
 </head>
-<body>
+<body onload="getAllAgents()">
+<script src="restClient.js"></script>
+<h1>Demo of blockchain Node</h1>
+<hr>
+
+<p>
+    <button type="button" class="button" id="addAgent" onclick="createAgent()">New Agent</button>
+    <button type="button" id="getAll" onclick="getAllAgents()" class="button">Refresh</button>
+    <button type="button" class="button" id="removeAllAgents" onclick="removeAgent()">Delete All Agents</button>
+</p>
+
+<hr>
+<p id="msg">
+    Empty
+</p>
+
+<table id="output">
+</table>
 
 </body>
 </html>
