@@ -15,6 +15,19 @@ function removeAgent(name) {
     sendHttpRequest("DELETE", "agent?name=", name, null, getAllAgents);
 }
 
+function removeAllAgents() {
+    sendHttpRequest("DELETE", "agent/all", null, getAllAgents())
+}
+function createAgent() {
+    let idx = getNextCount();
+    let name = "Agent" + idx;
+    let port = 3000 + idx;
+    sendHttpRequest("POST", "agent?name=" + name + "&port=" + port, null, displayAgent);
+}
+
+function mine(name) {
+    sendHttpRequest("POST", "agent/mine?agent=" + name, null, getAllAgents);
+}
 function sendHttpRequest(action, url, data, callback) {
     const xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
