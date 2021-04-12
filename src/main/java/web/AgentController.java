@@ -26,6 +26,7 @@ public class AgentController {
 
     @RequestMapping(method=DELETE)
     public void removeAgent(@RequestParam("name") String name) {
+
         agentManager.removeAgent(name);
     }
 
